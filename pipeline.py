@@ -44,8 +44,10 @@ Analyze the provided LinkedIn post and categorize it into ONE of these ongoing p
 Provide clear, professional, and practical Arabic takeaways.
 """
 
+import time
+
 def analyze_post_with_ai(post_text: str, author_name: str = "", author_title: str = "") -> PostAnalysis:
-    """Classifies and enriches a post using Gemini API."""
+    """Classifies and enriches a post using Gemini API with retry and model fallback."""
     if not ai_client:
         raise ValueError("GEMINI_API_KEY is not set.")
 
@@ -56,16 +58,28 @@ Author: {author_name} ({author_title})
 Post Content:
 \"\"\"{post_text}\"\"\"
 """
-    response = ai_client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=PostAnalysis,
-            temperature=0.2,
-        ),
-    )
-    return PostAnalysis.model_validate_json(response.text)
+    models_to_try = ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    last_err = None
+
+    for model_name in models_to_try:
+        for attempt in range(3):
+            try:
+                response = ai_client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=PostAnalysis,
+                        temperature=0.2,
+                    ),
+                )
+                return PostAnalysis.model_validate_json(response.text)
+            except Exception as e:
+                last_err = e
+                print(f"[{model_name}] Attempt {attempt + 1} failed ({e}). Retrying in 2 seconds...")
+                time.sleep(2)
+
+    raise last_err
 
 def ingest_post(post_data: Dict[str, Any]):
     """Saves raw post and AI analysis directly into Supabase Data Warehouse."""
