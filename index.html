@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Intel Hub | مركز المعرفة الذكي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 antialiased">
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <!-- Top Bar -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl backdrop-blur">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="relative flex h-3.5 w-3.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+          </span>
+          <h1 class="text-2xl font-black tracking-tight text-white">LinkedIn Intel Hub</h1>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold">مباشر ومربوط بـ Supabase</span>
+        </div>
+        <p class="text-sm text-slate-400 mt-1">
+          رصد وتحليل آلي لبوستات لينكدإن المتخصصة (أودو، التكاليف، المحاسبة، والذكاء الاصطناعي)
+        </p>
+      </div>
+      
+      <!-- Search & Refresh -->
+      <div class="flex items-center gap-2">
+        <div class="relative w-full sm:w-72">
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="ابحث بكلمة، كاتب، أو هاشتاج..." 
+            class="w-full px-4 py-2 text-sm rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+        <button onclick="fetchLivePosts()" title="تحديث البيانات" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition">
+          🔄
+        </button>
+      </div>
+    </header>
+
+    <!-- Category Filter Tabs -->
+    <div id="tabsContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs sm:text-sm font-semibold">
+      <button onclick="filterCategory('ALL')" class="tab-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white shadow-md transition" data-cat="ALL">
+        الكل (<span id="count-ALL">0</span>)
+      </button>
+      <button onclick="filterCategory('COSTING')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="COSTING">
+        💰 محاسبة التكاليف والتصنيع (<span id="count-COSTING">0</span>)
+      </button>
+      <button onclick="filterCategory('AI_ERP')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="AI_ERP">
+        🤖 الذكاء الاصطناعي وأودو (<span id="count-AI_ERP">0</span>)
+      </button>
+      <button onclick="filterCategory('ODOO_ADDONS')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="ODOO_ADDONS">
+        🧩 إضافات وموديولات أودو (<span id="count-ODOO_ADDONS">0</span>)
+      </button>
+      <button onclick="filterCategory('ODOO_ACC')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="ODOO_ACC">
+        📑 المحاسبة المالية والتقفيل (<span id="count-ODOO_ACC">0</span>)
+      </button>
+      <button onclick="filterCategory('CASE_STUDIES')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="CASE_STUDIES">
+        🏭 دراسات حالة عملية (<span id="count-CASE_STUDIES">0</span>)
+      </button>
+    </div>
+
+    <!-- Posts Grid -->
+    <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="col-span-full py-16 text-center text-slate-400">
+        <span class="inline-block animate-spin text-2xl mb-2">⏳</span>
+        <p class="text-sm">جارٍ تحميل البيانات الحية من قاعدة بيانات Supabase...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://topmkrzlbckamtjbjtmc.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvcG1rcnpsYmNrYW10amJqdG1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUzODY2MTksImV4cCI6MjExMDk2MjYxOX0.8VOMEw2Cnl1WaKZluP9cJEbC9b_iPIB5XmdpkthrbKw";
+    
+    let supabaseClient = null;
+    try {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    } catch(e) {
+      console.warn("Supabase client init error", e);
+    }
+
+    let allPosts = [];
+    let currentCat = 'ALL';
+    let searchQuery = '';
+
+    const categoryStyles = {
+      'AI_ERP': { label: 'الذكاء الاصطناعي وأودو', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
+      'COSTING': { label: 'محاسبة التكاليف والتصنيع', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+      'ODOO_ADDONS': { label: 'إضافات وموديولات أودو', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+      'ODOO_ACC': { label: 'المحاسبة المالية والتقفيل', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+      'CASE_STUDIES': { label: 'دراسات حالة عملية', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20' }
+    };
+
+    async function fetchLivePosts() {
+      const grid = document.getElementById('postsGrid');
+      grid.innerHTML = `
+        <div class="col-span-full py-16 text-center text-slate-400">
+          <span class="inline-block animate-spin text-2xl mb-2">⏳</span>
+          <p class="text-sm">جارٍ تحميل البيانات الحية من قاعدة بيانات Supabase...</p>
+        </div>
+      `;
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('v_daily_project_feed')
+          .select('*')
+          .order('analyzed_at', { ascending: false });
+
+        if (error) throw error;
+        allPosts = data || [];
+      } catch (err) {
+        console.error("Live fetch failed, using cached data:", err);
+      }
+
+      updateCounts();
+      renderPosts();
+    }
+
+    function updateCounts() {
+      document.getElementById('count-ALL').innerText = allPosts.length;
+      ['COSTING', 'AI_ERP', 'ODOO_ADDONS', 'ODOO_ACC', 'CASE_STUDIES'].forEach(c => {
+        const el = document.getElementById(`count-${c}`);
+        if (el) {
+          el.innerText = allPosts.filter(p => p.project_code === c).length;
+        }
+      });
+    }
+
+    function renderPosts() {
+      const grid = document.getElementById('postsGrid');
+      grid.innerHTML = '';
+
+      const filtered = allPosts.filter(p => {
+        const matchesCat = currentCat === 'ALL' || p.project_code === currentCat;
+        const q = searchQuery.toLowerCase();
+        const matchesSearch = q === '' ||
+          (p.practical_takeaway && p.practical_takeaway.toLowerCase().includes(q)) ||
+          (p.author_name && p.author_name.toLowerCase().includes(q)) ||
+          (p.odoo_feature_or_module && p.odoo_feature_or_module.toLowerCase().includes(q)) ||
+          (p.tags && p.tags.some(t => t.toLowerCase().includes(q)));
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-500">
+            <p class="text-base font-semibold">لا توجد منشورات مطابقة للبحث أو التصنيف المحدد.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(post => {
+        const meta = categoryStyles[post.project_code] || { label: post.project_title || post.project_code, badge: 'bg-slate-800 text-slate-300 border-slate-700' };
+        const score = post.relevance_score || 95;
+        const tags = Array.isArray(post.tags) ? post.tags : [];
+
+        const card = document.createElement('div');
+        card.className = "flex flex-col justify-between p-5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 transition-all duration-200 shadow-lg space-y-4";
+        card.innerHTML = `
+          <div class="space-y-3">
+            <!-- Header Badges -->
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${meta.badge}">
+                ${meta.label}
+              </span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ${score}% توافق
+              </span>
+            </div>
+
+            <!-- Author info -->
+            <div>
+              <h3 class="text-base font-bold text-white tracking-wide">${post.author_name || 'خبير أودو'}</h3>
+              <p class="text-xs text-slate-400 line-clamp-1 mt-0.5" title="${post.author_title || ''}">
+                ${post.author_title || 'استشاري ERP ومحاسبة تكاليف'}
+              </p>
+            </div>
+
+            <!-- Module Tag -->
+            <div class="text-xs font-mono text-indigo-400 bg-indigo-500/5 border border-indigo-500/10 px-2.5 py-1 rounded-md inline-block">
+              ⚙️ ${post.odoo_feature_or_module || 'Odoo Module'}
+            </div>
+
+            <!-- Takeaway (الخلاصة) -->
+            <div class="text-xs text-slate-200 leading-relaxed bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
+              <strong class="text-emerald-400 block mb-1.5 font-bold">💡 الخلاصة العملية:</strong>
+              ${post.practical_takeaway || 'تحليل عملي للبوست.'}
+            </div>
+          </div>
+
+          <!-- Bottom: Tags and Action Link -->
+          <div class="pt-3 border-t border-slate-800/80 space-y-3">
+            <div class="flex flex-wrap gap-1.5">
+              ${tags.map(t => `<span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700/60">${t}</span>`).join('')}
+            </div>
+            
+            <a href="${post.post_url}" target="_blank" class="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md hover:shadow-indigo-500/20 transition">
+              <span>قراءة البوست الأصلي على لينكدإن</span>
+              <span>↗</span>
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterCategory(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = "tab-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white shadow-md transition";
+        } else {
+          btn.className = "tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+        }
+      });
+      renderPosts();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim();
+      renderPosts();
+    });
+
+    // Initial load
+    fetchLivePosts();
+  </script>
+</body>
+</html>
