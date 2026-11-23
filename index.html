@@ -11,69 +11,64 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Cairo', system-ui, -apple-system, sans-serif; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.6);
-    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 lg:p-8 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen p-3 sm:p-6 lg:p-8 antialiased selection:bg-indigo-500 selection:text-white">
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Top Header & Main Mode Switcher -->
-    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl glass-card shadow-2xl">
+    <!-- Top Header & Main Mode Switcher (Clean Light Theme) -->
+    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm">
       <div>
         <div class="flex items-center gap-3">
           <span class="relative flex h-3.5 w-3.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-indigo-600"></span>
           </span>
-          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">LinkedIn Intel & Career Hub</h1>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 font-bold">Supabase Live</span>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">LinkedIn Intel & Career Hub</h1>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">Supabase Live</span>
         </div>
-        <p class="text-xs sm:text-sm text-slate-400 mt-1">
-          رصد ذكي يومي للمنشورات المتخصصة والفرص الوظيفية في مجالات (أودو، التكاليف، المحاسبة، والذكاء الاصطناعي)
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          رصد ذكي يومي لمنشورات أودو وإصداراته (Odoo 20)، التكاليف، المحاسبة، ورادار الوظائف
         </p>
       </div>
 
-      <!-- Mode Switcher (Slicer: Posts vs Jobs) -->
-      <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 self-start lg:self-center">
-        <button id="btnModePosts" onclick="switchMainMode('POSTS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-md transition-all">
+      <!-- Mode Switcher (Posts vs Jobs) -->
+      <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 self-start lg:self-center">
+        <button id="btnModePosts" onclick="switchMainMode('POSTS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-indigo-600 shadow-sm border border-slate-200 transition-all">
           <span>📰 المنشورات والتحليلات</span>
-          <span id="badgeCountPosts" class="px-1.5 py-0.5 text-[11px] rounded-md bg-indigo-800 text-indigo-200">0</span>
+          <span id="badgeCountPosts" class="px-1.5 py-0.5 text-[11px] rounded-md bg-indigo-50 text-indigo-700 font-bold">0</span>
         </button>
-        <button id="btnModeJobs" onclick="switchMainMode('JOBS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all">
+        <button id="btnModeJobs" onclick="switchMainMode('JOBS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all">
           <span>💼 رادار الوظائف</span>
-          <span id="badgeCountJobs" class="px-1.5 py-0.5 text-[11px] rounded-md bg-slate-800 text-slate-300">0</span>
+          <span id="badgeCountJobs" class="px-1.5 py-0.5 text-[11px] rounded-md bg-slate-200 text-slate-700 font-bold">0</span>
         </button>
       </div>
     </header>
 
-    <!-- Controls Bar: Timeframe Slicer & Search -->
-    <div class="p-4 sm:p-5 rounded-2xl glass-card space-y-4">
+    <!-- Controls Bar: Timeframe & Filters -->
+    <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
       
-      <!-- Top Row: Timeframe Slicer -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+      <!-- Top Row: Timeframe Slicer & Search -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-bold text-indigo-400 flex items-center gap-1">
+          <span class="text-xs font-bold text-indigo-600 flex items-center gap-1">
             ⏱️ <span class="hidden sm:inline">نطاق الوقت:</span>
           </span>
-          <!-- Timeframe Pills (Slicer) -->
+          <!-- Timeframe Pills -->
           <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs font-semibold">
-            <button onclick="setTimeframe('ALL')" class="time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-time="ALL">
-              الكل
+            <button onclick="setTimeframe('ALL')" class="time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition" data-time="ALL">
+              كل الأوقات
             </button>
-            <button onclick="setTimeframe('TODAY')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="TODAY">
+            <button onclick="setTimeframe('TODAY')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition" data-time="TODAY">
               ⚡ اليوم (24h)
             </button>
-            <button onclick="setTimeframe('3DAYS')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="3DAYS">
+            <button onclick="setTimeframe('3DAYS')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition" data-time="3DAYS">
               🕒 آخر 3 أيام
             </button>
-            <button onclick="setTimeframe('WEEK')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="WEEK">
+            <button onclick="setTimeframe('WEEK')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition" data-time="WEEK">
               📅 هذا الأسبوع
             </button>
-            <button onclick="setTimeframe('MONTH')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="MONTH">
+            <button onclick="setTimeframe('MONTH')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition" data-time="MONTH">
               🗓️ هذا الشهر
             </button>
           </div>
@@ -84,49 +79,53 @@
           <input 
             id="searchInput" 
             type="text" 
-            placeholder="بحث بكلمة، مسمى، أو هاشتاج..." 
-            class="w-full px-3.5 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="ابحث بكلمة، كاتب، Odoo 20، أو هاشتاج..." 
+            class="w-full px-3.5 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
           />
         </div>
       </div>
 
-      <!-- Secondary Slicer (Dynamic based on Mode) -->
-      <!-- Posts Slicers -->
-      <div id="postsSlicers" class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
-        <span class="text-slate-500 text-[11px] whitespace-nowrap ml-1">تصفية المشاريع:</span>
-        <button onclick="filterPostCategory('ALL')" class="post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-pcat="ALL">
-          الكل (<span id="count-p-ALL">0</span>)
-        </button>
-        <button onclick="filterPostCategory('COSTING')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="COSTING">
-          💰 التكاليف والتصنيع (<span id="count-p-COSTING">0</span>)
-        </button>
-        <button onclick="filterPostCategory('AI_ERP')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="AI_ERP">
-          🤖 الذكاء الاصطناعي وأودو (<span id="count-p-AI_ERP">0</span>)
-        </button>
-        <button onclick="filterPostCategory('ODOO_ADDONS')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="ODOO_ADDONS">
-          🧩 إضافات أودو OCA (<span id="count-p-ODOO_ADDONS">0</span>)
-        </button>
-        <button onclick="filterPostCategory('ODOO_ACC')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="ODOO_ACC">
-          📑 المحاسبة المالية (<span id="count-p-ODOO_ACC">0</span>)
-        </button>
-        <button onclick="filterPostCategory('CASE_STUDIES')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="CASE_STUDIES">
-          🏭 دراسات حالة (<span id="count-p-CASE_STUDIES">0</span>)
-        </button>
+      <!-- Posts Slicers with Odoo Master Category & Subcategories -->
+      <div id="postsSlicers" class="space-y-2">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+          <span class="text-slate-400 text-[11px] whitespace-nowrap ml-1 font-bold">التصنيفات:</span>
+          <button onclick="filterPostCategory('ALL')" class="post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition" data-pcat="ALL">
+            الكل (<span id="count-p-ALL">0</span>)
+          </button>
+          <button onclick="filterPostCategory('ODOO_VERSIONS')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 transition" data-pcat="ODOO_VERSIONS">
+            🚀 أودو 20 والتحديثات المستقبلية (<span id="count-p-ODOO_VERSIONS">0</span>)
+          </button>
+          <button onclick="filterPostCategory('ODOO_ADDONS')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100 transition" data-pcat="ODOO_ADDONS">
+            🧩 إضافات أودو ومجتمع OCA (<span id="count-p-ODOO_ADDONS">0</span>)
+          </button>
+          <button onclick="filterPostCategory('AI_ERP')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 transition" data-pcat="AI_ERP">
+            🤖 الذكاء الاصطناعي وأودو (<span id="count-p-AI_ERP">0</span>)
+          </button>
+          <button onclick="filterPostCategory('COSTING')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition" data-pcat="COSTING">
+            💰 محاسبة التكاليف والتصنيع (<span id="count-p-COSTING">0</span>)
+          </button>
+          <button onclick="filterPostCategory('ODOO_ACC')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition" data-pcat="ODOO_ACC">
+            📑 المحاسبة المالية بأودو (<span id="count-p-ODOO_ACC">0</span>)
+          </button>
+          <button onclick="filterPostCategory('CASE_STUDIES')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition" data-pcat="CASE_STUDIES">
+            🏭 دراسات حالة عملية (<span id="count-p-CASE_STUDIES">0</span>)
+          </button>
+        </div>
       </div>
 
       <!-- Jobs Slicers (Country & Workplace) -->
       <div id="jobsSlicers" class="hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
-        <span class="text-slate-500 text-[11px] whitespace-nowrap ml-1">الدولة ونوع العمل:</span>
-        <button onclick="filterJobCountry('ALL')" class="job-country-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-jcountry="ALL">
+        <span class="text-slate-400 text-[11px] whitespace-nowrap ml-1 font-bold">الدولة ونوع العمل:</span>
+        <button onclick="filterJobCountry('ALL')" class="job-country-btn active px-3 py-1.5 rounded-lg bg-emerald-600 text-white shadow-sm transition" data-jcountry="ALL">
           كل الفرص (<span id="count-j-ALL">0</span>)
         </button>
-        <button onclick="filterJobCountry('السعودية')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="السعودية">
+        <button onclick="filterJobCountry('السعودية')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition" data-jcountry="السعودية">
           🇸🇦 السعودية (<span id="count-j-ksa">0</span>)
         </button>
-        <button onclick="filterJobCountry('مصر')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="مصر">
+        <button onclick="filterJobCountry('مصر')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition" data-jcountry="مصر">
           🇪🇬 مصر (<span id="count-j-egy">0</span>)
         </button>
-        <button onclick="filterJobCountry('Remote')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="Remote">
+        <button onclick="filterJobCountry('Remote')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition" data-jcountry="Remote">
           🌐 عن بُعد (Remote) (<span id="count-j-rem">0</span>)
         </button>
       </div>
@@ -151,7 +150,7 @@
       console.warn("Supabase init error", e);
     }
 
-    let currentMode = 'POSTS'; // 'POSTS' or 'JOBS'
+    let currentMode = 'POSTS';
     let currentTimeframe = 'ALL';
     let currentPostCat = 'ALL';
     let currentJobCountry = 'ALL';
@@ -161,15 +160,15 @@
     let allJobs = [];
 
     const categoryStyles = {
-      'AI_ERP': { label: 'الذكاء الاصطناعي وأودو', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
-      'COSTING': { label: 'محاسبة التكاليف والتصنيع', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
-      'ODOO_ADDONS': { label: 'إضافات وموديولات أودو', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-      'ODOO_ACC': { label: 'المحاسبة المالية والتقفيل', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
-      'CASE_STUDIES': { label: 'دراسات حالة عملية', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/30' }
+      'ODOO_VERSIONS': { label: '🚀 أودو 20 وخارطة الطريق', badge: 'bg-purple-50 text-purple-700 border-purple-200' },
+      'ODOO_ADDONS': { label: '🧩 إضافات أودو وOCA', badge: 'bg-amber-50 text-amber-800 border-amber-200' },
+      'AI_ERP': { label: '🤖 الذكاء الاصطناعي وأودو', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+      'COSTING': { label: '💰 محاسبة التكاليف والتصنيع', badge: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+      'ODOO_ACC': { label: '📑 المحاسبة المالية والتقفيل', badge: 'bg-blue-50 text-blue-700 border-blue-200' },
+      'CASE_STUDIES': { label: '🏭 دراسات حالة عملية', badge: 'bg-slate-100 text-slate-700 border-slate-200' }
     };
 
     async function loadData() {
-      // 1. Fetch Posts
       try {
         const { data: postsData } = await supabaseClient
           .from('v_daily_project_feed')
@@ -180,7 +179,6 @@
         console.error("Failed to load posts", e);
       }
 
-      // 2. Fetch Jobs
       try {
         const { data: jobsData } = await supabaseClient
           .from('linkedin_jobs')
@@ -199,14 +197,12 @@
       document.getElementById('badgeCountPosts').innerText = allPosts.length;
       document.getElementById('badgeCountJobs').innerText = allJobs.length;
 
-      // Post counts
       document.getElementById('count-p-ALL').innerText = allPosts.length;
-      ['COSTING', 'AI_ERP', 'ODOO_ADDONS', 'ODOO_ACC', 'CASE_STUDIES'].forEach(c => {
+      ['ODOO_VERSIONS', 'ODOO_ADDONS', 'COSTING', 'AI_ERP', 'ODOO_ACC', 'CASE_STUDIES'].forEach(c => {
         const el = document.getElementById(`count-p-${c}`);
         if (el) el.innerText = allPosts.filter(p => p.project_code === c).length;
       });
 
-      // Job counts
       document.getElementById('count-j-ALL').innerText = allJobs.length;
       document.getElementById('count-j-ksa').innerText = allJobs.filter(j => j.country === 'السعودية').length;
       document.getElementById('count-j-egy').innerText = allJobs.filter(j => j.country === 'مصر').length;
@@ -251,47 +247,47 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-500 font-bold">لا توجد منشورات مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 font-bold">لا توجد منشورات مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
         return;
       }
 
       filtered.forEach(p => {
-        const meta = categoryStyles[p.project_code] || { label: p.project_title, badge: 'bg-slate-800 text-slate-300 border-slate-700' };
+        const meta = categoryStyles[p.project_code] || { label: p.project_title, badge: 'bg-slate-100 text-slate-700 border-slate-200' };
         const tags = Array.isArray(p.tags) ? p.tags : [];
         const card = document.createElement('div');
-        card.className = "flex flex-col justify-between p-5 rounded-2xl glass-card hover:border-indigo-500/50 transition-all duration-200 shadow-xl space-y-4";
+        card.className = "flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all duration-200 shadow-sm space-y-4";
         card.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-center justify-between gap-2">
               <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${meta.badge}">
                 ${meta.label}
               </span>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
                 ${p.relevance_score || 95}% توافق
               </span>
             </div>
 
             <div>
-              <h3 class="text-base font-bold text-white tracking-wide">${p.author_name}</h3>
-              <p class="text-xs text-slate-400 line-clamp-1 mt-0.5">${p.author_title || 'استشاري ERP'}</p>
+              <h3 class="text-base font-bold text-slate-900 tracking-tight">${p.author_name}</h3>
+              <p class="text-xs text-slate-500 line-clamp-1 mt-0.5">${p.author_title || 'استشاري Odoo & ERP'}</p>
             </div>
 
-            <div class="text-xs font-mono text-indigo-400 bg-indigo-500/5 border border-indigo-500/10 px-2.5 py-1 rounded-md inline-block">
+            <div class="text-xs font-mono text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-md inline-block">
               ⚙️ ${p.odoo_feature_or_module || 'Odoo Module'}
             </div>
 
-            <div class="text-xs text-slate-200 leading-relaxed bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
-              <strong class="text-emerald-400 block mb-1 font-bold">💡 الخلاصة العملية:</strong>
+            <div class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+              <strong class="text-indigo-600 block mb-1 font-bold">💡 الخلاصة العملية:</strong>
               ${p.practical_takeaway}
             </div>
           </div>
 
-          <div class="pt-3 border-t border-slate-800/80 space-y-3">
+          <div class="pt-3 border-t border-slate-100 space-y-3">
             <div class="flex flex-wrap gap-1.5">
-              ${tags.map(t => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 text-slate-400 border border-slate-800">${t}</span>`).join('')}
+              ${tags.map(t => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">${t}</span>`).join('')}
             </div>
-            <a href="${p.post_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 text-white transition shadow">
-              <span>قراءة البوست على لينكدإن</span>
+            <a href="${p.post_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-sm">
+              <span>عرض البوستات على لينكدإن</span>
               <span>↗</span>
             </a>
           </div>
@@ -314,53 +310,48 @@
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-500 font-bold">لا توجد وظائف مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 font-bold">لا توجد وظائف مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
         return;
       }
 
       filtered.forEach(j => {
         const reqs = Array.isArray(j.requirements) ? j.requirements : [];
         const card = document.createElement('div');
-        card.className = "flex flex-col justify-between p-5 rounded-2xl glass-card hover:border-emerald-500/50 transition-all duration-200 shadow-xl space-y-4 border-slate-800";
+        card.className = "flex flex-col justify-between p-5 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition-all duration-200 shadow-sm space-y-4";
         card.innerHTML = `
           <div class="space-y-3">
-            <!-- Header: Workplace & Level -->
             <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-bold px-2.5 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full border bg-emerald-50 text-emerald-800 border-emerald-200">
                 💼 ${j.domain}
               </span>
-              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
                 ${j.workplace_type}
               </span>
             </div>
 
-            <!-- Title & Company -->
             <div>
-              <h3 class="text-base font-bold text-white tracking-wide">${j.job_title}</h3>
-              <p class="text-xs text-indigo-400 font-semibold mt-0.5">🏢 ${j.company_name}</p>
-              <p class="text-xs text-slate-400 mt-0.5">📍 ${j.location}</p>
+              <h3 class="text-base font-bold text-slate-900 tracking-tight">${j.job_title}</h3>
+              <p class="text-xs text-indigo-600 font-semibold mt-0.5">🏢 ${j.company_name}</p>
+              <p class="text-xs text-slate-500 mt-0.5">📍 ${j.location}</p>
             </div>
 
-            <!-- Salary if available -->
             ${j.salary_range ? `
-              <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+              <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
                 💵 ${j.salary_range}
               </div>
             ` : ''}
 
-            <!-- Summary -->
-            <p class="text-xs text-slate-300 leading-relaxed bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-200">
               ${j.description_summary}
             </p>
           </div>
 
-          <!-- Bottom: Requirements & Apply -->
-          <div class="pt-3 border-t border-slate-800/80 space-y-3">
+          <div class="pt-3 border-t border-slate-100 space-y-3">
             <div class="flex flex-wrap gap-1.5">
-              ${reqs.map(r => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 text-slate-400 border border-slate-800">✓ ${r}</span>`).join('')}
+              ${reqs.map(r => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">✓ ${r}</span>`).join('')}
             </div>
-            <a href="${j.apply_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 text-white transition shadow">
-              <span>التقديم على الوظيفة في لينكدإن</span>
+            <a href="${j.apply_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2.5 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm">
+              <span>عرض الوظائف الحية على لينكدإن</span>
               <span>↗</span>
             </a>
           </div>
@@ -369,7 +360,6 @@
       });
     }
 
-    // Switch between Posts and Jobs
     function switchMainMode(mode) {
       currentMode = mode;
       const btnPosts = document.getElementById('btnModePosts');
@@ -378,53 +368,50 @@
       const jobsSlicers = document.getElementById('jobsSlicers');
 
       if (mode === 'POSTS') {
-        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-md transition-all";
-        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all";
+        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-indigo-600 shadow-sm border border-slate-200 transition-all";
+        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all";
         postsSlicers.classList.remove('hidden');
         jobsSlicers.classList.add('hidden');
       } else {
-        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-md transition-all";
-        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all";
+        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-emerald-600 shadow-sm border border-slate-200 transition-all";
+        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all";
         jobsSlicers.classList.remove('hidden');
         postsSlicers.classList.add('hidden');
       }
       renderCurrentView();
     }
 
-    // Timeframe Slicer
     function setTimeframe(tf) {
       currentTimeframe = tf;
       document.querySelectorAll('.time-btn').forEach(btn => {
         if (btn.getAttribute('data-time') === tf) {
-          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition";
+          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition";
         } else {
-          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition";
         }
       });
       renderCurrentView();
     }
 
-    // Post Category Slicer
     function filterPostCategory(cat) {
       currentPostCat = cat;
       document.querySelectorAll('.post-cat-btn').forEach(btn => {
         if (btn.getAttribute('data-pcat') === cat) {
-          btn.className = "post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition";
+          btn.className = "post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm transition";
         } else {
-          btn.className = "post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+          btn.className = "post-cat-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition";
         }
       });
       renderCurrentView();
     }
 
-    // Job Country Slicer
     function filterJobCountry(country) {
       currentJobCountry = country;
       document.querySelectorAll('.job-country-btn').forEach(btn => {
         if (btn.getAttribute('data-jcountry') === country) {
-          btn.className = "job-country-btn active px-3 py-1.5 rounded-lg bg-emerald-600 text-white shadow transition";
+          btn.className = "job-country-btn active px-3 py-1.5 rounded-lg bg-emerald-600 text-white shadow-sm transition";
         } else {
-          btn.className = "job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+          btn.className = "job-country-btn px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 transition";
         }
       });
       renderCurrentView();
@@ -435,7 +422,6 @@
       renderCurrentView();
     });
 
-    // Start
     loadData();
   </script>
 </body>
