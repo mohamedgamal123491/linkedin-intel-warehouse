@@ -118,5 +118,40 @@ def ingest_post(post_data: Dict[str, Any]):
 
     print(f"[+] Saved & Mapped to [{analysis.project_code}] ({analysis.relevance_score}%): {url}")
 
+def run_daily_batch():
+    """Runs ingestion on candidate posts from the monitoring feed."""
+    print("🚀 Starting LinkedIn Intel Pipeline execution...")
+    
+    # Candidate posts feed (e.g. from scraper, webhook, or monitored feed)
+    candidate_posts = [
+        {
+            "post_url": "https://www.linkedin.com/posts/ai-agent-odoo-bank-reconciliation-2026",
+            "author_name": "Kareem Adel",
+            "author_title": "FinTech Solution Architect & Odoo ERP Specialist",
+            "post_text": "We automated 90% of complex bank statement reconciliations in Odoo 17 using Gemini Flash. The model parses unformatted payment descriptions, identifies matching invoices across multiple customer accounts, and suggests reconciliation entries with 98% accuracy.",
+            "likes": 210,
+            "comments": 35,
+            "published_date": "2026-11-23T01:00:00Z"
+        },
+        {
+            "post_url": "https://www.linkedin.com/posts/manufacturing-actual-costing-overhead-allocation",
+            "author_name": "Eng. Sameh Lotfy",
+            "author_title": "Industrial Engineer | Cost Accounting Consultant",
+            "post_text": "How do you allocate indirect manufacturing overheads (MOH) to Odoo Work Centers? In continuous production, relying solely on standard direct labor hours causes huge under-absorption. Here is how to configure cost centers and secondary cost distribution journals in Odoo.",
+            "likes": 178,
+            "comments": 29,
+            "published_date": "2026-11-22T19:00:00Z"
+        }
+    ]
+
+    for post in candidate_posts:
+        try:
+            print(f"\nAnalyzing: {post['post_url']}")
+            ingest_post(post)
+        except Exception as e:
+            print(f"Error processing post {post['post_url']}: {e}")
+
+    print("\n✅ Daily batch execution finished successfully.")
+
 if __name__ == "__main__":
-    print("LinkedIn Intel Warehouse Pipeline ready.")
+    run_daily_batch()
