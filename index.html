@@ -3,79 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LinkedIn Intel Hub | مركز المعرفة الذكي</title>
+  <title>LinkedIn Intel & Career Radar | مركز المعرفة ورادار الوظائف</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Cairo', system-ui, -apple-system, sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8 antialiased">
-  <div class="max-w-6xl mx-auto space-y-6">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 lg:p-8 antialiased selection:bg-indigo-500 selection:text-white">
+  <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Top Bar -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl backdrop-blur">
+    <!-- Top Header & Main Mode Switcher -->
+    <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl glass-card shadow-2xl">
       <div>
         <div class="flex items-center gap-3">
           <span class="relative flex h-3.5 w-3.5">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
           </span>
-          <h1 class="text-2xl font-black tracking-tight text-white">LinkedIn Intel Hub</h1>
-          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold">مباشر ومربوط بـ Supabase</span>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">LinkedIn Intel & Career Hub</h1>
+          <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 font-bold">Supabase Live</span>
         </div>
-        <p class="text-sm text-slate-400 mt-1">
-          رصد وتحليل آلي لبوستات لينكدإن المتخصصة (أودو، التكاليف، المحاسبة، والذكاء الاصطناعي)
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">
+          رصد ذكي يومي للمنشورات المتخصصة والفرص الوظيفية في مجالات (أودو، التكاليف، المحاسبة، والذكاء الاصطناعي)
         </p>
       </div>
-      
-      <!-- Search & Refresh -->
-      <div class="flex items-center gap-2">
-        <div class="relative w-full sm:w-72">
-          <input 
-            id="searchInput" 
-            type="text" 
-            placeholder="ابحث بكلمة، كاتب، أو هاشتاج..." 
-            class="w-full px-4 py-2 text-sm rounded-xl bg-slate-800/90 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        <button onclick="fetchLivePosts()" title="تحديث البيانات" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition">
-          🔄
+
+      <!-- Mode Switcher (Slicer: Posts vs Jobs) -->
+      <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 self-start lg:self-center">
+        <button id="btnModePosts" onclick="switchMainMode('POSTS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-md transition-all">
+          <span>📰 المنشورات والتحليلات</span>
+          <span id="badgeCountPosts" class="px-1.5 py-0.5 text-[11px] rounded-md bg-indigo-800 text-indigo-200">0</span>
+        </button>
+        <button id="btnModeJobs" onclick="switchMainMode('JOBS')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all">
+          <span>💼 رادار الوظائف</span>
+          <span id="badgeCountJobs" class="px-1.5 py-0.5 text-[11px] rounded-md bg-slate-800 text-slate-300">0</span>
         </button>
       </div>
     </header>
 
-    <!-- Category Filter Tabs -->
-    <div id="tabsContainer" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs sm:text-sm font-semibold">
-      <button onclick="filterCategory('ALL')" class="tab-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white shadow-md transition" data-cat="ALL">
-        الكل (<span id="count-ALL">0</span>)
-      </button>
-      <button onclick="filterCategory('COSTING')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="COSTING">
-        💰 محاسبة التكاليف والتصنيع (<span id="count-COSTING">0</span>)
-      </button>
-      <button onclick="filterCategory('AI_ERP')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="AI_ERP">
-        🤖 الذكاء الاصطناعي وأودو (<span id="count-AI_ERP">0</span>)
-      </button>
-      <button onclick="filterCategory('ODOO_ADDONS')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="ODOO_ADDONS">
-        🧩 إضافات وموديولات أودو (<span id="count-ODOO_ADDONS">0</span>)
-      </button>
-      <button onclick="filterCategory('ODOO_ACC')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="ODOO_ACC">
-        📑 المحاسبة المالية والتقفيل (<span id="count-ODOO_ACC">0</span>)
-      </button>
-      <button onclick="filterCategory('CASE_STUDIES')" class="tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-cat="CASE_STUDIES">
-        🏭 دراسات حالة عملية (<span id="count-CASE_STUDIES">0</span>)
-      </button>
+    <!-- Controls Bar: Timeframe Slicer & Search -->
+    <div class="p-4 sm:p-5 rounded-2xl glass-card space-y-4">
+      
+      <!-- Top Row: Timeframe Slicer -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-indigo-400 flex items-center gap-1">
+            ⏱️ <span class="hidden sm:inline">نطاق الوقت:</span>
+          </span>
+          <!-- Timeframe Pills (Slicer) -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 text-xs font-semibold">
+            <button onclick="setTimeframe('ALL')" class="time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-time="ALL">
+              الكل
+            </button>
+            <button onclick="setTimeframe('TODAY')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="TODAY">
+              ⚡ اليوم (24h)
+            </button>
+            <button onclick="setTimeframe('3DAYS')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="3DAYS">
+              🕒 آخر 3 أيام
+            </button>
+            <button onclick="setTimeframe('WEEK')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="WEEK">
+              📅 هذا الأسبوع
+            </button>
+            <button onclick="setTimeframe('MONTH')" class="time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-time="MONTH">
+              🗓️ هذا الشهر
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative w-full sm:w-72">
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="بحث بكلمة، مسمى، أو هاشتاج..." 
+            class="w-full px-3.5 py-1.5 text-xs sm:text-sm rounded-xl bg-slate-900 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+
+      <!-- Secondary Slicer (Dynamic based on Mode) -->
+      <!-- Posts Slicers -->
+      <div id="postsSlicers" class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+        <span class="text-slate-500 text-[11px] whitespace-nowrap ml-1">تصفية المشاريع:</span>
+        <button onclick="filterPostCategory('ALL')" class="post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-pcat="ALL">
+          الكل (<span id="count-p-ALL">0</span>)
+        </button>
+        <button onclick="filterPostCategory('COSTING')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="COSTING">
+          💰 التكاليف والتصنيع (<span id="count-p-COSTING">0</span>)
+        </button>
+        <button onclick="filterPostCategory('AI_ERP')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="AI_ERP">
+          🤖 الذكاء الاصطناعي وأودو (<span id="count-p-AI_ERP">0</span>)
+        </button>
+        <button onclick="filterPostCategory('ODOO_ADDONS')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="ODOO_ADDONS">
+          🧩 إضافات أودو OCA (<span id="count-p-ODOO_ADDONS">0</span>)
+        </button>
+        <button onclick="filterPostCategory('ODOO_ACC')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="ODOO_ACC">
+          📑 المحاسبة المالية (<span id="count-p-ODOO_ACC">0</span>)
+        </button>
+        <button onclick="filterPostCategory('CASE_STUDIES')" class="post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-pcat="CASE_STUDIES">
+          🏭 دراسات حالة (<span id="count-p-CASE_STUDIES">0</span>)
+        </button>
+      </div>
+
+      <!-- Jobs Slicers (Country & Workplace) -->
+      <div id="jobsSlicers" class="hidden flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+        <span class="text-slate-500 text-[11px] whitespace-nowrap ml-1">الدولة ونوع العمل:</span>
+        <button onclick="filterJobCountry('ALL')" class="job-country-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition" data-jcountry="ALL">
+          كل الفرص (<span id="count-j-ALL">0</span>)
+        </button>
+        <button onclick="filterJobCountry('السعودية')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="السعودية">
+          🇸🇦 السعودية (<span id="count-j-ksa">0</span>)
+        </button>
+        <button onclick="filterJobCountry('مصر')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="مصر">
+          🇪🇬 مصر (<span id="count-j-egy">0</span>)
+        </button>
+        <button onclick="filterJobCountry('Remote')" class="job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition" data-jcountry="Remote">
+          🌐 عن بُعد (Remote) (<span id="count-j-rem">0</span>)
+        </button>
+      </div>
+
     </div>
 
-    <!-- Posts Grid -->
-    <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      <div class="col-span-full py-16 text-center text-slate-400">
-        <span class="inline-block animate-spin text-2xl mb-2">⏳</span>
-        <p class="text-sm">جارٍ تحميل البيانات الحية من قاعدة بيانات Supabase...</p>
-      </div>
+    <!-- Main Content Grid -->
+    <div id="mainGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Cards rendered via JS -->
     </div>
 
   </div>
@@ -88,127 +148,150 @@
     try {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     } catch(e) {
-      console.warn("Supabase client init error", e);
+      console.warn("Supabase init error", e);
     }
 
-    let allPosts = [];
-    let currentCat = 'ALL';
+    let currentMode = 'POSTS'; // 'POSTS' or 'JOBS'
+    let currentTimeframe = 'ALL';
+    let currentPostCat = 'ALL';
+    let currentJobCountry = 'ALL';
     let searchQuery = '';
 
+    let allPosts = [];
+    let allJobs = [];
+
     const categoryStyles = {
-      'AI_ERP': { label: 'الذكاء الاصطناعي وأودو', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-      'COSTING': { label: 'محاسبة التكاليف والتصنيع', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-      'ODOO_ADDONS': { label: 'إضافات وموديولات أودو', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-      'ODOO_ACC': { label: 'المحاسبة المالية والتقفيل', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-      'CASE_STUDIES': { label: 'دراسات حالة عملية', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20' }
+      'AI_ERP': { label: 'الذكاء الاصطناعي وأودو', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
+      'COSTING': { label: 'محاسبة التكاليف والتصنيع', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+      'ODOO_ADDONS': { label: 'إضافات وموديولات أودو', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+      'ODOO_ACC': { label: 'المحاسبة المالية والتقفيل', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+      'CASE_STUDIES': { label: 'دراسات حالة عملية', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/30' }
     };
 
-    async function fetchLivePosts() {
-      const grid = document.getElementById('postsGrid');
-      grid.innerHTML = `
-        <div class="col-span-full py-16 text-center text-slate-400">
-          <span class="inline-block animate-spin text-2xl mb-2">⏳</span>
-          <p class="text-sm">جارٍ تحميل البيانات الحية من قاعدة بيانات Supabase...</p>
-        </div>
-      `;
-
+    async function loadData() {
+      // 1. Fetch Posts
       try {
-        const { data, error } = await supabaseClient
+        const { data: postsData } = await supabaseClient
           .from('v_daily_project_feed')
           .select('*')
           .order('analyzed_at', { ascending: false });
-
-        if (error) throw error;
-        allPosts = data || [];
-      } catch (err) {
-        console.error("Live fetch failed, using cached data:", err);
+        allPosts = postsData || [];
+      } catch (e) {
+        console.error("Failed to load posts", e);
       }
 
-      updateCounts();
-      renderPosts();
+      // 2. Fetch Jobs
+      try {
+        const { data: jobsData } = await supabaseClient
+          .from('linkedin_jobs')
+          .select('*')
+          .order('posted_date', { ascending: false });
+        allJobs = jobsData || [];
+      } catch (e) {
+        console.error("Failed to load jobs", e);
+      }
+
+      updateBadges();
+      renderCurrentView();
     }
 
-    function updateCounts() {
-      document.getElementById('count-ALL').innerText = allPosts.length;
+    function updateBadges() {
+      document.getElementById('badgeCountPosts').innerText = allPosts.length;
+      document.getElementById('badgeCountJobs').innerText = allJobs.length;
+
+      // Post counts
+      document.getElementById('count-p-ALL').innerText = allPosts.length;
       ['COSTING', 'AI_ERP', 'ODOO_ADDONS', 'ODOO_ACC', 'CASE_STUDIES'].forEach(c => {
-        const el = document.getElementById(`count-${c}`);
-        if (el) {
-          el.innerText = allPosts.filter(p => p.project_code === c).length;
-        }
+        const el = document.getElementById(`count-p-${c}`);
+        if (el) el.innerText = allPosts.filter(p => p.project_code === c).length;
       });
+
+      // Job counts
+      document.getElementById('count-j-ALL').innerText = allJobs.length;
+      document.getElementById('count-j-ksa').innerText = allJobs.filter(j => j.country === 'السعودية').length;
+      document.getElementById('count-j-egy').innerText = allJobs.filter(j => j.country === 'مصر').length;
+      document.getElementById('count-j-rem').innerText = allJobs.filter(j => j.country === 'Remote' || j.workplace_type === 'Remote').length;
     }
 
-    function renderPosts() {
-      const grid = document.getElementById('postsGrid');
+    function filterByTimeframe(dateStr) {
+      if (!dateStr || currentTimeframe === 'ALL') return true;
+      const itemDate = new Date(dateStr);
+      const now = new Date();
+      const diffHours = (now - itemDate) / (1000 * 60 * 60);
+
+      if (currentTimeframe === 'TODAY') return diffHours <= 24;
+      if (currentTimeframe === '3DAYS') return diffHours <= 72;
+      if (currentTimeframe === 'WEEK') return diffHours <= (24 * 7);
+      if (currentTimeframe === 'MONTH') return diffHours <= (24 * 30);
+      return true;
+    }
+
+    function renderCurrentView() {
+      const grid = document.getElementById('mainGrid');
       grid.innerHTML = '';
 
+      if (currentMode === 'POSTS') {
+        renderPosts(grid);
+      } else {
+        renderJobs(grid);
+      }
+    }
+
+    function renderPosts(grid) {
+      const q = searchQuery.toLowerCase();
       const filtered = allPosts.filter(p => {
-        const matchesCat = currentCat === 'ALL' || p.project_code === currentCat;
-        const q = searchQuery.toLowerCase();
-        const matchesSearch = q === '' ||
+        const matchCat = currentPostCat === 'ALL' || p.project_code === currentPostCat;
+        const matchTime = filterByTimeframe(p.published_date || p.analyzed_at);
+        const matchSearch = q === '' ||
           (p.practical_takeaway && p.practical_takeaway.toLowerCase().includes(q)) ||
           (p.author_name && p.author_name.toLowerCase().includes(q)) ||
           (p.odoo_feature_or_module && p.odoo_feature_or_module.toLowerCase().includes(q)) ||
           (p.tags && p.tags.some(t => t.toLowerCase().includes(q)));
-        return matchesCat && matchesSearch;
+        return matchCat && matchTime && matchSearch;
       });
 
       if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full py-16 text-center text-slate-500">
-            <p class="text-base font-semibold">لا توجد منشورات مطابقة للبحث أو التصنيف المحدد.</p>
-          </div>
-        `;
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-500 font-bold">لا توجد منشورات مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
         return;
       }
 
-      filtered.forEach(post => {
-        const meta = categoryStyles[post.project_code] || { label: post.project_title || post.project_code, badge: 'bg-slate-800 text-slate-300 border-slate-700' };
-        const score = post.relevance_score || 95;
-        const tags = Array.isArray(post.tags) ? post.tags : [];
-
+      filtered.forEach(p => {
+        const meta = categoryStyles[p.project_code] || { label: p.project_title, badge: 'bg-slate-800 text-slate-300 border-slate-700' };
+        const tags = Array.isArray(p.tags) ? p.tags : [];
         const card = document.createElement('div');
-        card.className = "flex flex-col justify-between p-5 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-indigo-500/50 transition-all duration-200 shadow-lg space-y-4";
+        card.className = "flex flex-col justify-between p-5 rounded-2xl glass-card hover:border-indigo-500/50 transition-all duration-200 shadow-xl space-y-4";
         card.innerHTML = `
           <div class="space-y-3">
-            <!-- Header Badges -->
             <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${meta.badge}">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${meta.badge}">
                 ${meta.label}
               </span>
-              <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                ${score}% توافق
+              <span class="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ${p.relevance_score || 95}% توافق
               </span>
             </div>
 
-            <!-- Author info -->
             <div>
-              <h3 class="text-base font-bold text-white tracking-wide">${post.author_name || 'خبير أودو'}</h3>
-              <p class="text-xs text-slate-400 line-clamp-1 mt-0.5" title="${post.author_title || ''}">
-                ${post.author_title || 'استشاري ERP ومحاسبة تكاليف'}
-              </p>
+              <h3 class="text-base font-bold text-white tracking-wide">${p.author_name}</h3>
+              <p class="text-xs text-slate-400 line-clamp-1 mt-0.5">${p.author_title || 'استشاري ERP'}</p>
             </div>
 
-            <!-- Module Tag -->
             <div class="text-xs font-mono text-indigo-400 bg-indigo-500/5 border border-indigo-500/10 px-2.5 py-1 rounded-md inline-block">
-              ⚙️ ${post.odoo_feature_or_module || 'Odoo Module'}
+              ⚙️ ${p.odoo_feature_or_module || 'Odoo Module'}
             </div>
 
-            <!-- Takeaway (الخلاصة) -->
-            <div class="text-xs text-slate-200 leading-relaxed bg-slate-950/80 p-3.5 rounded-xl border border-slate-800/80">
-              <strong class="text-emerald-400 block mb-1.5 font-bold">💡 الخلاصة العملية:</strong>
-              ${post.practical_takeaway || 'تحليل عملي للبوست.'}
+            <div class="text-xs text-slate-200 leading-relaxed bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+              <strong class="text-emerald-400 block mb-1 font-bold">💡 الخلاصة العملية:</strong>
+              ${p.practical_takeaway}
             </div>
           </div>
 
-          <!-- Bottom: Tags and Action Link -->
           <div class="pt-3 border-t border-slate-800/80 space-y-3">
             <div class="flex flex-wrap gap-1.5">
-              ${tags.map(t => `<span class="text-[11px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700/60">${t}</span>`).join('')}
+              ${tags.map(t => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 text-slate-400 border border-slate-800">${t}</span>`).join('')}
             </div>
-            
-            <a href="${post.post_url}" target="_blank" class="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white shadow-md hover:shadow-indigo-500/20 transition">
-              <span>قراءة البوست الأصلي على لينكدإن</span>
+            <a href="${p.post_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 text-white transition shadow">
+              <span>قراءة البوست على لينكدإن</span>
               <span>↗</span>
             </a>
           </div>
@@ -217,25 +300,143 @@
       });
     }
 
-    function filterCategory(cat) {
-      currentCat = cat;
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        if (btn.getAttribute('data-cat') === cat) {
-          btn.className = "tab-btn active px-4 py-2 rounded-xl bg-indigo-600 text-white shadow-md transition";
+    function renderJobs(grid) {
+      const q = searchQuery.toLowerCase();
+      const filtered = allJobs.filter(j => {
+        const matchCountry = currentJobCountry === 'ALL' || j.country === currentJobCountry || (currentJobCountry === 'Remote' && (j.country === 'Remote' || j.workplace_type === 'Remote'));
+        const matchTime = filterByTimeframe(j.posted_date);
+        const matchSearch = q === '' ||
+          j.job_title.toLowerCase().includes(q) ||
+          j.company_name.toLowerCase().includes(q) ||
+          (j.description_summary && j.description_summary.toLowerCase().includes(q)) ||
+          (j.requirements && j.requirements.some(r => r.toLowerCase().includes(q)));
+        return matchCountry && matchTime && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-500 font-bold">لا توجد وظائف مطابقة للبحث أو النطاق الزمني المحدد.</div>`;
+        return;
+      }
+
+      filtered.forEach(j => {
+        const reqs = Array.isArray(j.requirements) ? j.requirements : [];
+        const card = document.createElement('div');
+        card.className = "flex flex-col justify-between p-5 rounded-2xl glass-card hover:border-emerald-500/50 transition-all duration-200 shadow-xl space-y-4 border-slate-800";
+        card.innerHTML = `
+          <div class="space-y-3">
+            <!-- Header: Workplace & Level -->
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                💼 ${j.domain}
+              </span>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                ${j.workplace_type}
+              </span>
+            </div>
+
+            <!-- Title & Company -->
+            <div>
+              <h3 class="text-base font-bold text-white tracking-wide">${j.job_title}</h3>
+              <p class="text-xs text-indigo-400 font-semibold mt-0.5">🏢 ${j.company_name}</p>
+              <p class="text-xs text-slate-400 mt-0.5">📍 ${j.location}</p>
+            </div>
+
+            <!-- Salary if available -->
+            ${j.salary_range ? `
+              <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg">
+                💵 ${j.salary_range}
+              </div>
+            ` : ''}
+
+            <!-- Summary -->
+            <p class="text-xs text-slate-300 leading-relaxed bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+              ${j.description_summary}
+            </p>
+          </div>
+
+          <!-- Bottom: Requirements & Apply -->
+          <div class="pt-3 border-t border-slate-800/80 space-y-3">
+            <div class="flex flex-wrap gap-1.5">
+              ${reqs.map(r => `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-900 text-slate-400 border border-slate-800">✓ ${r}</span>`).join('')}
+            </div>
+            <a href="${j.apply_url}" target="_blank" class="flex items-center justify-center gap-1.5 w-full py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 text-white transition shadow">
+              <span>التقديم على الوظيفة في لينكدإن</span>
+              <span>↗</span>
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Switch between Posts and Jobs
+    function switchMainMode(mode) {
+      currentMode = mode;
+      const btnPosts = document.getElementById('btnModePosts');
+      const btnJobs = document.getElementById('btnModeJobs');
+      const postsSlicers = document.getElementById('postsSlicers');
+      const jobsSlicers = document.getElementById('jobsSlicers');
+
+      if (mode === 'POSTS') {
+        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-md transition-all";
+        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all";
+        postsSlicers.classList.remove('hidden');
+        jobsSlicers.classList.add('hidden');
+      } else {
+        btnJobs.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-md transition-all";
+        btnPosts.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-400 hover:text-white transition-all";
+        jobsSlicers.classList.remove('hidden');
+        postsSlicers.classList.add('hidden');
+      }
+      renderCurrentView();
+    }
+
+    // Timeframe Slicer
+    function setTimeframe(tf) {
+      currentTimeframe = tf;
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        if (btn.getAttribute('data-time') === tf) {
+          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition";
         } else {
-          btn.className = "tab-btn px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+          btn.className = "time-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
         }
       });
-      renderPosts();
+      renderCurrentView();
+    }
+
+    // Post Category Slicer
+    function filterPostCategory(cat) {
+      currentPostCat = cat;
+      document.querySelectorAll('.post-cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-pcat') === cat) {
+          btn.className = "post-cat-btn active px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition";
+        } else {
+          btn.className = "post-cat-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+        }
+      });
+      renderCurrentView();
+    }
+
+    // Job Country Slicer
+    function filterJobCountry(country) {
+      currentJobCountry = country;
+      document.querySelectorAll('.job-country-btn').forEach(btn => {
+        if (btn.getAttribute('data-jcountry') === country) {
+          btn.className = "job-country-btn active px-3 py-1.5 rounded-lg bg-emerald-600 text-white shadow transition";
+        } else {
+          btn.className = "job-country-btn px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition";
+        }
+      });
+      renderCurrentView();
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
       searchQuery = e.target.value.trim();
-      renderPosts();
+      renderCurrentView();
     });
 
-    // Initial load
-    fetchLivePosts();
+    // Start
+    loadData();
   </script>
 </body>
 </html>
