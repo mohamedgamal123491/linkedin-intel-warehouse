@@ -24,20 +24,21 @@ ai_client = genai.Client(
 ) if GEMINI_API_KEY else None
 
 class PostAnalysis(BaseModel):
-    project_code: str = Field(description="Must be one of: 'AI_ERP', 'COSTING', 'ODOO_ACC', 'CASE_STUDIES', or 'OTHER'")
+    project_code: str = Field(description="Must be one of: 'AI_ERP', 'COSTING', 'ODOO_ACC', 'ODOO_ADDONS', 'CASE_STUDIES', or 'OTHER'")
     relevance_score: int = Field(description="Relevance percentage from 0 to 100")
-    tags: List[str] = Field(description="3 to 5 targeted hashtags, e.g. ['#Odoo18', '#CostAccounting']")
-    odoo_feature_or_module: str = Field(description="Odoo module or functional area (e.g. Accounting, MRP, Invoicing, Inventory, AI/Automation)")
+    tags: List[str] = Field(description="3 to 5 targeted hashtags, e.g. ['#Odoo18', '#CostAccounting', '#OCA']")
+    odoo_feature_or_module: str = Field(description="Odoo module or functional area (e.g. Accounting, MRP, Invoicing, Inventory, Addons/OCA, AI/Automation)")
     practical_takeaway: str = Field(description="Arabic concise summary of practical value for an ERP / Accounting consultant")
     key_ideas: List[str] = Field(description="List of key actionable ideas or takeaways in Arabic")
 
 SYSTEM_PROMPT = """
-You are an expert ERP & Cost Accounting Consultant specializing in Odoo ERP, Financial Accounting, Cost Accounting, and AI Automation in business applications.
+You are an expert ERP & Cost Accounting Consultant specializing in Odoo ERP, Financial Accounting, Cost Accounting, Community Addons (OCA), and AI Automation.
 
 Analyze the provided LinkedIn post and categorize it into ONE of these ongoing project categories:
 - 'AI_ERP': AI agents, LLMs, document OCR, robotic process automation (RPA), financial bots integrated with Odoo/ERP.
 - 'COSTING': Cost accounting, manufacturing (MRP), BOM costing, Landed Costs, standard vs actual costing, AVCO/FIFO inventory valuation.
 - 'ODOO_ACC': Financial accounting, Chart of Accounts, Bank Reconciliation, E-Invoicing (ZATCA / ETA), Taxes, General Ledger in Odoo.
+- 'ODOO_ADDONS': Odoo Apps store modules, open-source OCA addons, custom modules, functional extensions.
 - 'CASE_STUDIES': Real-world implementation stories, troubleshooting, lessons learned, consultant best practices.
 - 'OTHER': Irrelevant to ERP, Accounting, or AI.
 
