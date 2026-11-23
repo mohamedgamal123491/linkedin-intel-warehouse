@@ -18,7 +18,10 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("Missing SUPABASE_URL or SUPABASE_KEY in environment.")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-ai_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+ai_client = genai.Client(
+    api_key=GEMINI_API_KEY,
+    http_options={"api_version": "v1beta"}
+) if GEMINI_API_KEY else None
 
 class PostAnalysis(BaseModel):
     project_code: str = Field(description="Must be one of: 'AI_ERP', 'COSTING', 'ODOO_ACC', 'CASE_STUDIES', or 'OTHER'")
@@ -46,12 +49,17 @@ def analyze_post_with_ai(post_text: str, author_name: str = "", author_title: st
     if not ai_client:
         raise ValueError("GEMINI_API_KEY is not set.")
 
-    prompt = f"Author: {author_name} ({author_title})\nPost Content:\n\"\"\"{post_text}\"\"\""
+    prompt = f"""{SYSTEM_PROMPT}
+
+Analyze this post:
+Author: {author_name} ({author_title})
+Post Content:
+\"\"\"{post_text}\"\"\"
+"""
     response = ai_client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
             response_mime_type="application/json",
             response_schema=PostAnalysis,
             temperature=0.2,
